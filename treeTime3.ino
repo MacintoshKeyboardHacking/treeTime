@@ -18,7 +18,7 @@
 // stock functions: solid r/g/p/b/y/w, pulse r/g/p/b/y/w/all, random flash/pulse, sparkle r/g/p/b/all
 
 // timing defines:
-const int D0 = 15000;    // stock=500, values as low as 100 work but not reliably, max ~ 100k and still functional
+const int D0 = 5000;     // stock=500, values as low as 100 work but not reliably, max ~ 100k and still functional
 const int D1 = 7500;     // stock=5000
 const int D2 = 15000;    // stock=15000
 const int DlyD = 30000;  // stock=42000ish
@@ -48,7 +48,7 @@ int lsb = 0;
 int txpin = 0;
 int enable = 1;
 
-int func = 2;  // MODE
+int func = 1;  // MODE
 int oldfunc = 0;
 int doReset = 1;
 int doTick = 0;
@@ -207,9 +207,10 @@ void loop() {
   }
 
   if (func == 1) {
-    loops = 5;
+    loops = 1;
+    doTick = 1;
     txmt(txpin, mode + 32);
-    txmt(txpin, mode + 32);
+    //  txmt(txpin, mode + 32);
   }
 
   if (func == 2) {
@@ -229,9 +230,23 @@ void loop() {
   }
 
   if (func == 5) {
-    loops = 0;
-    delay(100);
-    int tmp = -1;
+    loops = -1;
+    doTick = 1;
+    txmt(txpin, mode + 32);
+    //delay(20);
+    txmt(txpin, mode + 32);
+    //delay(20);
+    //txmt(txpin, 3+32);
+
+    //delay(100);
+    //    txmt(txpin, mode+16);
+    //
+    //delay(500);
+    //       txmt(txpin, 3+32);
+
+    //txmt(txpin, mode+24);
+    //delay(150);
+    int tmp = 0;
     while (tmp) {
       tmp--;
       digitalWrite(txpin, SOFF);
@@ -253,7 +268,7 @@ void loop() {
 
     if (!digitalRead(buttonA)) {
       func++;
-      if (func > 4) { func = 1; }
+      if (func > 5) { func = 1; }
 
       Serial.println(func);
       loops = 0;
@@ -271,6 +286,8 @@ void loop() {
 
       if ((func == 4) | (func == 3)) {
         delayMicroseconds(1000);
+      } else if (func == 1) {
+        delayMicroseconds(D0);
       } else {
         delayMicroseconds(D0);
       }
@@ -281,10 +298,21 @@ void loop() {
       if (func == 3) { delay(1500); }
       if (func == 4) { delay(1000); }
     }
-    delay(100);
+    if (func == 5) {
+      delay(20);
+    } else if (func == 1) {
+      delay(100);
+    } else {
+      delay(100);
+    }
   }
   mode = newmode(mode);
 }
+
+// dark modes
+// dotick=1/delay(10)
+
+
 
 // stock CMDs
 
